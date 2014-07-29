@@ -45,9 +45,15 @@ func main() {
     }
 
     r := csv.NewReader(toFile)
-    r.FieldsPerRecord = 2
+    r.FieldsPerRecord = 0
     r.TrimLeadingSpace = true
-
+    
+    tags, err := r.Read()
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    
     to, err := r.ReadAll()
     if err != nil {
         fmt.Println(err)
@@ -75,14 +81,16 @@ func main() {
     auth := smtp.PlainAuth("", senderEmail, senderPassword, smtpHost)
     success := 0
     for _, v := range to {
-        recipEmail := v[0]
-        recipName := v[1]
-        newMsg := regexp.MustCompile(`\Q$EMAIL$\E`).ReplaceAll(regexp.MustCompile(`\Q$NAME$\E`).ReplaceAll(msg, []byte(recipName)), []byte(recipEmail))
-
-        if !quiet {
-            fmt.Printf("%s, %s\n", recipEmail, recipName)
+        newMsg := msg
+        for i, tag := range tags {
+            newMsg = regexp.MustCompile(fmt.Sprintf(`\Q$%s$\E`, tag)).ReplaceAll(newMsg, []byte(v[i]))
         }
 
+        if !quiet {
+            fmt.Println(v)
+        }
+
+        recipEmail := v[0]
         err = smtp.SendMail(fmt.Sprintf("%s:%s", smtpHost, smtpPort), auth, senderEmail, []string{recipEmail}, newMsg)
 
         if err != nil && !force {

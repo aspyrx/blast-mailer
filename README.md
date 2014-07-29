@@ -24,19 +24,32 @@ For example:
 
 File Formats
 ------------
-The recipients file should be a CSV file, with the recipient email address as the first field, and their name as the second. For example:
 
-    alice@example.com, Alice Smith
-    john@example.com, John Smith
+###Recipients
+
+The recipients file should be a comma-separated plain text file.  
+The first line in the file should be a list of tags that define the keywords that will be substituted later for actual values.  
+The rows that follow contain the values that will be substituted. They should be in the same order as the tags - i.e., the first tag corresponds to the first value, the second tag to the second value, etc.
+
+**Note**: The first value in each row _must_ be the recipient's email.
+
+For example, a complete recipients file:
+
+    EMAIL, FIRST_NAME, LAST_NAME, UNIQUE_MESSAGE
+    alice@example.com, Alice, Smith, foo
+    john@example.com, John, Smith, bar
     
-The message file should be a plaintext SMTP request body, headers optional. Any instances of "$EMAIL$" will be replaced with the recipient's email address, and any instances of "$NAME$" will be replaced with the recipient's name. For example, the message:
+###Message
+
+The message file should be a plaintext SMTP request body, headers optional. Any two "$" characters surrounding a tag specified in the recipients file will be replaced with the appropriate value for that field. For example, using the previous recipients file, the message:
 
     Content-Type: text/html
-    To: "$NAME$" <$EMAIL$>
+    To: "$FIRST_NAME$ $LAST_NAME" <$EMAIL$>
     Subject: blast-mailer Test
     
-    <p>Hi, $NAME$!</p>
-    <P>Your email address is $EMAIL$.</p>
+    <p>Hi, $FIRST_NAME$!</p>
+    <p>Your email address is $EMAIL$.</p>
+    <p>Here is a unique message for you: $UNIQUE_MESSAGE$</p>
     
 would be sent to the aforementioned Alice Smith as follows:
 
@@ -44,6 +57,7 @@ would be sent to the aforementioned Alice Smith as follows:
     To: "Alice Smith" <alice@example.com>
     Subject: blast-mailer Test
     
-    <p>Hi, Alice Smith!</p>
-    <P>Your email address is alice@example.com.</p>
+    <p>Hi, Alice!</p>
+    <p>Your email address is alice@example.com.</p>
+    <p>Here is a unique message for you: foo</p>
     
