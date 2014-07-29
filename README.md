@@ -44,7 +44,7 @@ For example, a complete recipients file:
 The message file should be a plaintext SMTP request body, headers optional. Any two "$" characters surrounding a tag specified in the recipients file will be replaced with the appropriate value for that field. For example, using the previous recipients file, the message:
 
     Content-Type: text/html
-    To: "$FIRST_NAME$ $LAST_NAME" <$EMAIL$>
+    To: "$FIRST_NAME$ $LAST_NAME$" <$EMAIL$>
     Subject: blast-mailer Test
     
     <p>Hi, $FIRST_NAME$!</p>
