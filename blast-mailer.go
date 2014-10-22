@@ -8,6 +8,7 @@ import (
     "io/ioutil"
     "net/smtp"
     "os"
+    "time"
     "regexp"
 )
 
@@ -21,16 +22,18 @@ func main() {
     var smtpPort string
     var quiet bool
     var force bool
+    var delay int64
 
     flag.StringVar(&toFilePath, "to", "", "Path to file containing recipients in CSV format. See http://github.com/aspyrx/blast-mailer for format specifications.")
     flag.StringVar(&msgFilePath, "msg", "", "Path to file containing the message, including headers. See http://github.com/aspyrx/blast-mailer for special replaceable identifiers.")
-    flag.BoolVar(&shouldAuth, "auth", false, "Whether or not authentication is required.")
+    flag.BoolVar(&shouldAuth, "auth", false, "Whether or not authentication is required. Default: no")
     flag.StringVar(&senderEmail, "email", "", "The sender's email address, for authentication.")
     flag.StringVar(&senderPassword, "password", "", "The sender's password, for authentication.")
     flag.StringVar(&smtpHost, "host", "", "The hostname of the SMTP server to use.")
     flag.StringVar(&smtpPort, "port", "", "The SMTP server's port (without the colon).")
     flag.BoolVar(&quiet, "quiet", false, "Quiet mode - names and email addresses will not be logged. Default: off.")
     flag.BoolVar(&force, "force", false, "Force mode - all prompts and non-fatal errors will be ignored. Default: off.")
+    flag.Int64Var(&delay, "delay", 0, "Delay between sending each message.")
 
     flag.Parse()
 
@@ -111,6 +114,7 @@ func main() {
         }
 
         success++
+        time.Sleep(delay)
     }
 
     fmt.Printf("Sending complete. Emails sent: %d\n", success)
