@@ -14,6 +14,7 @@ import (
 func main() {
     var toFilePath string
     var msgFilePath string
+    var shouldAuth bool
     var senderEmail string
     var senderPassword string
     var smtpHost string
@@ -23,8 +24,9 @@ func main() {
 
     flag.StringVar(&toFilePath, "to", "", "Path to file containing recipients in CSV format. See http://github.com/aspyrx/blast-mailer for format specifications.")
     flag.StringVar(&msgFilePath, "msg", "", "Path to file containing the message, including headers. See http://github.com/aspyrx/blast-mailer for special replaceable identifiers.")
-    flag.StringVar(&senderEmail, "email", "", "The sender's email address.")
-    flag.StringVar(&senderPassword, "password", "", "The sender's password.")
+    flag.BoolVar(&shouldAuth, "auth", false, "Whether or not authentication is required.")
+    flag.StringVar(&senderEmail, "email", "", "The sender's email address, for authentication.")
+    flag.StringVar(&senderPassword, "password", "", "The sender's password, for authentication.")
     flag.StringVar(&smtpHost, "host", "", "The hostname of the SMTP server to use.")
     flag.StringVar(&smtpPort, "port", "", "The SMTP server's port (without the colon).")
     flag.BoolVar(&quiet, "quiet", false, "Quiet mode - names and email addresses will not be logged. Default: off.")
@@ -66,7 +68,10 @@ func main() {
     }
 
     if !quiet {
-        fmt.Printf("Sender email: %s\n", senderEmail)
+        if shouldAuth {
+            fmt.Printf("Sender email: %s\n", senderEmail)
+        }
+        
         fmt.Printf("SMTP server: %s:%s\n", smtpHost, smtpPort)
     }
 
@@ -78,7 +83,11 @@ func main() {
         }
     }
 
-    auth := smtp.PlainAuth("", senderEmail, senderPassword, smtpHost)
+    var auth smtp.Auth
+    if shouldAuth {
+        auth = smtp.PlainAuth("", senderEmail, senderPassword, smtpHost)
+    }
+    
     success := 0
     for _, v := range to {
         newMsg := msg
@@ -94,7 +103,7 @@ func main() {
         err = smtp.SendMail(fmt.Sprintf("%s:%s", smtpHost, smtpPort), auth, senderEmail, []string{recipEmail}, newMsg)
 
         if err != nil && !force {
-            fmt.Printf("Error sending email to '%s'. Continue? (y/N): ", recipEmail)
+            fmt.Printf("Error sending email to '%s':\n%v\nContinue? (y/N): ", recipEmail, err)
             if !isOk() {
                 fmt.Printf("Sending cancelled. Emails sent: %d\n", success)
                 os.Exit(1)
