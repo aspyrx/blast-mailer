@@ -33,7 +33,7 @@ func main() {
     flag.StringVar(&smtpPort, "port", "", "The SMTP server's port (without the colon).")
     flag.BoolVar(&quiet, "quiet", false, "Quiet mode - names and email addresses will not be logged. Default: off.")
     flag.BoolVar(&force, "force", false, "Force mode - all prompts and non-fatal errors will be ignored. Default: off.")
-    flag.Int64Var(&delay, "delay", 0, "Delay between sending each message.")
+    flag.Int64Var(&delay, "delay", 0, "Delay in seconds between sending each message.")
 
     flag.Parse()
 
@@ -92,6 +92,7 @@ func main() {
     }
     
     success := 0
+    delayDuration := time.Duration(delay) * time.Second
     for _, v := range to {
         newMsg := msg
         for i, tag := range tags {
@@ -114,7 +115,7 @@ func main() {
         }
 
         success++
-        time.Sleep(delay)
+        time.Sleep(delayDuration)
     }
 
     fmt.Printf("Sending complete. Emails sent: %d\n", success)
