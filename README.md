@@ -9,18 +9,20 @@ Usage
     blast-mailer <flags>
   
 Flags:  
+  -auth: Whether or not to use password authentication. **Default: false**  
   -email: The sender's email address. (required)
   -to: Path to file containing recipients in CSV format. (required)  
   -msg: Path to file containing the message, including headers. (required)  
   -host: The hostname of the SMTP server to use. (required)  
   -password: The sender's password. (required)  
   -port: The SMTP server's port (without the colon). (required)  
+  -delay: Delay in seconds between sending attempts.
   -force: Force mode - all prompts and non-fatal errors will be ignored.  
   -quiet: Quiet mode - names and email addresses will not be logged.  
 
 For example:  
 
-    blast-mailer -to to.csv -msg msg.txt -host smtp.example.com -port 587 -email example@example.com -password foobar
+    blast-mailer -to to.csv -msg msg.txt -host smtp.example.com -port 587 -auth -email example@example.com -password foobar -delay 2
 
 File Formats
 ------------
