@@ -16,7 +16,7 @@ Flags:
   -host: The hostname of the SMTP server to use. (required)  
   -password: The sender's password. (required)  
   -port: The SMTP server's port (without the colon). (required)  
-  -delay: Delay in seconds between sending attempts.
+  -delay: Delay in seconds between sending attempts.  
   -force: Force mode - all prompts and non-fatal errors will be ignored.  
   -quiet: Quiet mode - names and email addresses will not be logged.  
 
